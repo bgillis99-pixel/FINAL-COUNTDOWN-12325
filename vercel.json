@@ -1,4 +1,11 @@
 {
+  "version": 2,
+  "public": true,
+  "headers": [
+    {
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
   "headers": [
     {
       "source": "/sw.js",
