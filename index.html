@@ -3,6 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Countdown</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">The Final Countdown</h1>
+        <div class="countdown">
+            <div class="time-box">
+                <div class="time" id="days">00</div>
+                <div class="label">Days</div>
+            </div>
+            <div class="time-box">
+                <div class="time" id="hours">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-box">
+                <div class="time" id="minutes">00</div>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="time-box">
+                <div class="time" id="seconds">00</div>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+        <div class="target-date">
+            <p>Counting down to: <span id="target-display"></span></p>
+            <div class="date-selector">
+                <input type="datetime-local" id="date-picker" />
+                <button id="set-date">Set Date</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
     <meta name="description" content="CARB Clean Truck VIN Check - Verify California Air Resources Board compliance for commercial vehicles. Get answers to CARB FAQ and compliance requirements.">
     <meta name="keywords" content="CARB, clean truck, VIN check, California Air Resources Board, truck compliance, emissions, commercial vehicle, ACT regulation, HVIP">
     <meta name="theme-color" content="#dc2626">
