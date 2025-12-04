@@ -1,0 +1,284 @@
+/* ===========================
+   COLOR TOKENS (USA THEME)
+   =========================== */
+
+:root {
+  --color-navy: #002b5c;      /* buttons + headings */
+  --color-navy-dark: #001a3d; /* button active */
+  --color-red: #b22234;       /* apple logo red */
+  --color-bg: #ffffff;
+  --color-bg-soft: #f4f4f5;
+  --color-border: #d0d0d4;
+  --color-text: #111111;
+  --color-text-muted: #666666;
+  --color-error: #d32f2f;
+}
+
+/* ===========================
+   GLOBAL RESET / BASE
+   =========================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Roboto", sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Mobile-first layout */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  align-items: stretch;
+}
+
+/* ===========================
+   HEADER
+   =========================== */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.app-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  /* your logo image itself should be red; this is just sizing */
+}
+
+.app-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  color: var(--color-navy);
+}
+
+/* ===========================
+   MAIN CARD
+   =========================== */
+
+.app-card {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 24px;
+  border: 1px solid var(--color-border);
+  padding: 18px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.section-divider {
+  height: 1px;
+  background-color: #e5e5ea;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+
+.btn {
+  border-radius: 14px;
+  height: 56px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition:
+    background-color 120ms ease-out,
+    color 120ms ease-out,
+    transform 120ms ease-out,
+    box-shadow 120ms ease-out,
+    border-color 120ms ease-out;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Primary = NAVY filled */
+.btn-primary {
+  background-color: var(--color-navy);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 43, 92, 0.25);
+}
+
+.btn-primary:disabled {
+  background-color: #e0e0e0;
+  color: #aaaaaa;
+  box-shadow: none;
+  cursor: default;
+}
+
+.btn-primary:not(:disabled):active {
+  transform: scale(0.98);
+  background-color: var(--color-navy-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Secondary = NAVY outline */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-navy);
+  border: 1px solid var(--color-navy);
+  box-shadow: none;
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+  background-color: rgba(0, 43, 92, 0.04);
+}
+
+/* Button content layout */
+.btn-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.btn-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.btn-subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+/* ===========================
+   FORM ELEMENTS
+   =========================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.field-input {
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  padding: 0 14px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.field-input::placeholder {
+  color: #b0b0b5;
+}
+
+.field-input:focus {
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 2px rgba(0, 43, 92, 0.15);
+}
+
+.field-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.char-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.helper-text {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.error-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-error);
+}
+
+/* ===========================
+   FOOTER
+   =========================== */
+
+.app-footer {
+  margin-top: auto;
+  padding: 16px 0 8px;
+}
+
+.footer-text {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ===========================
+   RESPONSIVE: TABLET / DESKTOP
+   =========================== */
+
+@media (min-width: 768px) {
+  body {
+    background-color: var(--color-bg-soft);
+  }
+
+  .page {
+    align-items: center;
+    padding: 32px 16px;
+  }
+
+  .app-header {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .app-card {
+    max-width: 480px;
+    padding: 22px 20px 24px;
+  }
+}
