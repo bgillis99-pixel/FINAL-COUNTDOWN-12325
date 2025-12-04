@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CARB Clean Truck Check - VIN Lookup Tool">
+    <meta name="theme-color" content="#001f3f">
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CARB Truck Check">
+
+    <title>CARB Clean Truck Check</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Logo -->
+            <div class="logo-container">
+                <img src="assets/logo-red.svg" alt="CARB Logo" class="logo" id="logo">
+            </div>
+
+            <!-- Title -->
+            <h1>Clean Truck Check</h1>
+            <p class="subtitle">Enter your vehicle identification number</p>
+
+            <!-- VIN Input Form -->
+            <form id="vinForm" class="vin-form">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="vinInput"
+                        name="vin"
+                        placeholder="Enter 17-digit VIN"
+                        maxlength="17"
+                        autocomplete="off"
+                        autocapitalize="characters"
+                        required
+                    >
+                    <div class="input-hint" id="inputHint"></div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    Check VIN
+                </button>
+            </form>
+
+            <!-- Results Area -->
+            <div id="results" class="results hidden">
+                <div class="result-header">
+                    <h2>Vehicle Information</h2>
+                </div>
+                <div id="resultContent" class="result-content">
+                    <!-- Results will be populated here -->
+                </div>
+                <button type="button" class="btn-secondary" id="resetBtn">
+                    Check Another VIN
+                </button>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error" class="error hidden"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>California Air Resources Board</p>
+            <p class="footer-small">carbcleantruckcheck.app</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
