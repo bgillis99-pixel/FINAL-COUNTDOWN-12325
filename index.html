@@ -1,777 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Final Countdown</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Clean Truck VIN Check – CARB Mobile</title>
+
+  <!-- Mobile / responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA / theme -->
+  <meta name="theme-color" content="#002B5C" />
+
+  <!-- iOS home-screen icon -->
+  <link rel="apple-touch-icon" href="/icons/arb-192.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/arb-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/arb-192.png" />
+
+  <!-- Web App Manifest (PWA) -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- Social / sharing -->
+  <meta property="og:title" content="Clean Truck VIN Check – CARB Mobile" />
+  <meta property="og:description" content="Instant CARB Clean Truck Check VIN lookup and mobile tester finder for California fleets and owner-operators." />
+  <meta property="og:url" content="https://www.carbcleantruckcheck.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://www.carbcleantruckcheck.app/og-image.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">The Final Countdown</h1>
-        <div class="countdown">
-            <div class="time-box">
-                <div class="time" id="days">00</div>
-                <div class="label">Days</div>
-            </div>
-            <div class="time-box">
-                <div class="time" id="hours">00</div>
-                <div class="label">Hours</div>
-            </div>
-            <div class="time-box">
-                <div class="time" id="minutes">00</div>
-                <div class="label">Minutes</div>
-            </div>
-            <div class="time-box">
-                <div class="time" id="seconds">00</div>
-                <div class="label">Seconds</div>
-            </div>
+  <main class="page">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <!-- Use the red version of your apple logo -->
+      <img
+        src="/icons/arb-logo-red.png"
+        alt="CARB Clean Truck Check logo"
+        class="app-logo"
+      />
+      <h1 class="app-title">Clean Truck VIN Check</h1>
+    </header>
+
+    <!-- MAIN CARD – this is the core UI -->
+    <section class="app-card">
+
+      <!-- PRIMARY CTA: SCAN VIN -->
+      <button
+        class="btn btn-primary btn-full"
+        id="scan-vin-btn"
+        type="button"
+      >
+        <span class="btn-icon" aria-hidden="true">📷</span>
+        <span class="btn-text">
+          <span class="btn-title">Scan VIN</span>
+          <span class="btn-subtitle">Use your camera to scan VIN</span>
+        </span>
+      </button>
+
+      <div class="section-divider"></div>
+
+      <!-- MANUAL VIN ENTRY -->
+      <div class="form-group">
+        <label for="vin-input" class="field-label">
+          Enter VIN (17 characters)
+        </label>
+        <input
+          id="vin-input"
+          name="vin"
+          type="text"
+          maxlength="17"
+          autocomplete="off"
+          class="field-input"
+          inputmode="text"
+          placeholder="1XPTP4EX5DD181493"
+        />
+        <div class="field-meta">
+          <span id="vin-char-count" class="char-count">0 / 17</span>
+          <span class="helper-text">Last 6 characters must be numbers</span>
         </div>
-        <div class="target-date">
-            <p>Counting down to: <span id="target-display"></span></p>
-            <div class="date-selector">
-                <input type="datetime-local" id="date-picker" />
-                <button id="set-date">Set Date</button>
-            </div>
-        </div>
-    </div>
-    <script src="script.js"></script>
-    <meta name="description" content="CARB Clean Truck VIN Check - Verify California Air Resources Board compliance for commercial vehicles. Get answers to CARB FAQ and compliance requirements.">
-    <meta name="keywords" content="CARB, clean truck, VIN check, California Air Resources Board, truck compliance, emissions, commercial vehicle, ACT regulation, HVIP">
-    <meta name="theme-color" content="#dc2626">
-
-    <!-- SEO Meta Tags -->
-    <meta property="og:title" content="CARB Clean Truck VIN Check - Compliance Verification">
-    <meta property="og:description" content="Check your commercial vehicle's CARB compliance status and learn about California emissions requirements.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://carbcleantruckcheck.app">
-
-    <!-- PWA Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="CARB VIN">
-
-    <!-- Icons -->
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="canonical" href="https://carbcleantruckcheck.app">
-
-    <title>CARB Clean Truck VIN Check - Compliance & FAQ</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-wrapper {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #dc2626;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Container */
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            display: none;
-        }
-
-        .container.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            display: block;
-        }
-
-        h1 {
-            color: #dc2626;
-            text-align: center;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            color: #dc2626;
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #dc2626;
-            padding-bottom: 10px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            text-transform: uppercase;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #dc2626;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #dc2626;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: #b91c1c;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .info {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f3f4f6;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .info h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .result.success {
-            background: #d1fae5;
-            color: #065f46;
-            display: block;
-        }
-
-        .result.error {
-            background: #fee2e2;
-            color: #991b1b;
-            display: block;
-        }
-
-        /* FAQ Section */
-        .faq-item {
-            margin-bottom: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .faq-question {
-            width: 100%;
-            padding: 15px 20px;
-            background: #f9fafb;
-            border: none;
-            text-align: left;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
-        }
-
-        .faq-question:hover {
-            background: #f3f4f6;
-        }
-
-        .faq-question.active {
-            background: #dc2626;
-            color: white;
-        }
-
-        .faq-icon {
-            font-size: 20px;
-            transition: transform 0.3s;
-        }
-
-        .faq-question.active .faq-icon {
-            transform: rotate(180deg);
-        }
-
-        .faq-answer {
-            padding: 0 20px;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .faq-answer.active {
-            padding: 20px;
-            max-height: 500px;
-        }
-
-        .faq-answer p {
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-
-        .faq-answer ul {
-            margin-left: 20px;
-            color: #555;
-            line-height: 1.8;
-        }
-
-        .faq-answer a {
-            color: #dc2626;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .faq-answer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Resources Section */
-        .resource-card {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .resource-card:hover {
-            border-color: #dc2626;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
-        }
-
-        .resource-card h3 {
-            color: #dc2626;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .resource-card p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .resource-link {
-            display: inline-block;
-            color: #dc2626;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 8px 16px;
-            border: 2px solid #dc2626;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .resource-link:hover {
-            background: #dc2626;
-            color: white;
-        }
-
-        .external-icon {
-            margin-left: 5px;
-            font-size: 12px;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            .nav-tab {
-                font-size: 12px;
-                padding: 10px 15px;
-            }
-        }
-    </style>
-
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is CARB and why does it matter for my truck?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The California Air Resources Board (CARB) is a state agency responsible for regulating air quality and vehicle emissions. CARB regulations affect commercial trucks operating in California, requiring compliance with emissions standards."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the Advanced Clean Trucks (ACT) regulation?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The ACT regulation requires manufacturers to sell an increasing percentage of zero-emission trucks in California starting in 2024, with targets reaching up to 75% for certain vehicle classes by 2035."
-          }
-        }
-      ]
-    }
-    </script>
-</head>
-<body>
-    <div class="app-wrapper">
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('check')">VIN Check</button>
-            <button class="nav-tab" onclick="showTab('faq')">CARB FAQ</button>
-            <button class="nav-tab" onclick="showTab('resources')">Resources</button>
-        </div>
-
-        <!-- VIN Check Section -->
-        <div id="check-section" class="container active">
-            <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="55" r="35" fill="#dc2626"/>
-                <ellipse cx="50" cy="55" rx="35" ry="32" fill="#dc2626"/>
-                <path d="M 50 20 Q 45 25 45 30 L 45 35" stroke="#059669" stroke-width="3" fill="none"/>
-                <ellipse cx="52" cy="28" rx="8" ry="5" fill="#059669"/>
-                <path d="M 35 50 Q 32 52 30 55" stroke="#fff" stroke-width="2" fill="none" opacity="0.4"/>
-            </svg>
-
-            <h1>CARB VIN Check</h1>
-            <p class="subtitle">Clean Truck VIN Check - California Air Resources Board</p>
-
-            <form id="vinForm">
-                <div class="form-group">
-                    <label for="vin">Enter Vehicle Identification Number (VIN)</label>
-                    <input
-                        type="text"
-                        id="vin"
-                        name="vin"
-                        placeholder="e.g., 1HGBH41JXMN109186"
-                        maxlength="17"
-                        required
-                    >
-                </div>
-
-                <button type="submit">Check Compliance</button>
-            </form>
-
-            <div id="result" class="result"></div>
-
-            <div class="info">
-                <h3>About CARB Compliance</h3>
-                <p>The California Air Resources Board (CARB) requires commercial trucks to meet specific emissions standards. Use this tool to verify your vehicle's compliance status.</p>
-            </div>
-        </div>
-
-        <!-- FAQ Section -->
-        <div id="faq-section" class="container">
-            <h2>CARB Frequently Asked Questions</h2>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>What is CARB and why does it matter for my truck?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>The California Air Resources Board (CARB) is a state agency under the California Environmental Protection Agency responsible for regulating air quality and vehicle emissions in California.</p>
-                    <p>CARB matters for your truck because:</p>
-                    <ul>
-                        <li>California has strict emissions standards for commercial vehicles</li>
-                        <li>Non-compliant trucks may face fines and operational restrictions</li>
-                        <li>CARB regulations affect truck registration and operation within California</li>
-                        <li>Compliance is required for most commercial trucks operating in the state</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com" target="_blank" rel="noopener">Learn more about CARB compliance at NorCal CARB Mobile</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>What is the Advanced Clean Trucks (ACT) regulation?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>The Advanced Clean Trucks (ACT) regulation, adopted by CARB in June 2020, requires manufacturers to transition to zero-emission trucks.</p>
-                    <p>Key points:</p>
-                    <ul>
-                        <li>Manufacturers must sell an increasing percentage of zero-emission trucks starting in 2024</li>
-                        <li>Sales requirements range from 5-75% depending on truck class by 2035</li>
-                        <li>Applies to medium and heavy-duty trucks (Class 2b-8)</li>
-                        <li>Large entities must report their annual truck purchases and fleet information</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/blog/advanced-clean-trucks-regulation" target="_blank" rel="noopener">Read our detailed ACT regulation guide</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>What is the Truck and Bus Regulation?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>The Truck and Bus Regulation requires diesel trucks and buses that operate in California to be upgraded to reduce emissions. Nearly all diesel-fueled trucks and buses with a gross vehicle weight rating (GVWR) greater than 14,000 pounds are subject to this regulation.</p>
-                    <p>Requirements include:</p>
-                    <ul>
-                        <li>Older engines must be replaced with newer, cleaner engines (2010 model year or newer)</li>
-                        <li>Diesel particulate filters (DPF) must be installed on certain older engines</li>
-                        <li>Vehicles must meet specific emission standards based on model year</li>
-                        <li>Compliance deadlines vary by vehicle type and usage</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/blog/truck-bus-regulation-explained" target="_blank" rel="noopener">Understanding the Truck and Bus Regulation</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>How do I check my truck's CARB compliance status?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>To check your truck's CARB compliance status:</p>
-                    <ul>
-                        <li>Use the VIN Check tool on this website</li>
-                        <li>Visit the official CARB website and use their compliance calculator</li>
-                        <li>Check your truck's engine model year and emission certification</li>
-                        <li>Review your diesel particulate filter (DPF) installation status</li>
-                        <li>Consult with a certified CARB mobile inspection service</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/services/carb-inspection" target="_blank" rel="noopener">Schedule a professional CARB inspection</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>What are the penalties for non-compliance?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Operating a non-compliant truck in California can result in significant penalties:</p>
-                    <ul>
-                        <li>Fines ranging from $300 to $1,000+ per vehicle per day</li>
-                        <li>Vehicle registration may be blocked or suspended</li>
-                        <li>Fleet owners may face additional penalties</li>
-                        <li>Potential impoundment of non-compliant vehicles</li>
-                        <li>Loss of California operating privileges</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/blog/carb-penalties-what-you-need-to-know" target="_blank" rel="noopener">Avoiding CARB penalties: What you need to know</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>What is HVIP and how can it help me?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>The Hybrid and Zero-Emission Truck and Bus Voucher Incentive Project (HVIP) provides point-of-sale rebates to help California fleets purchase or lease zero-emission and hybrid vehicles.</p>
-                    <p>Benefits include:</p>
-                    <ul>
-                        <li>Vouchers up to $400,000 for zero-emission trucks</li>
-                        <li>Reduced upfront costs for clean vehicle purchases</li>
-                        <li>Simplified application process</li>
-                        <li>First-come, first-served funding availability</li>
-                        <li>Helps offset the cost of CARB compliance upgrades</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/blog/hvip-funding-guide" target="_blank" rel="noopener">Complete HVIP funding guide and application tips</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>Do I need a CARB diesel particulate filter (DPF)?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Whether you need a diesel particulate filter (DPF) depends on your truck's model year and engine configuration:</p>
-                    <ul>
-                        <li>Trucks with 2010+ engines typically have DPFs installed from the factory</li>
-                        <li>Older trucks (2007-2009) may need aftermarket DPF installation</li>
-                        <li>Pre-2007 trucks must either install a DPF or upgrade to a newer engine</li>
-                        <li>DPFs must be CARB-verified and properly maintained</li>
-                        <li>Regular DPF cleaning and maintenance is required</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/services/dpf-installation" target="_blank" rel="noopener">Professional DPF installation and maintenance services</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>Are there exemptions to CARB regulations?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Yes, there are limited exemptions and extensions available:</p>
-                    <ul>
-                        <li>Low-use vehicles (operating less than 1,000 miles per year in California)</li>
-                        <li>Agricultural vehicles meeting specific criteria</li>
-                        <li>Vehicles in certain rural areas</li>
-                        <li>Historical or emergency vehicles</li>
-                        <li>Financial hardship extensions (requires documentation)</li>
-                        <li>Small fleet exemptions (under certain conditions)</li>
-                    </ul>
-                    <p><a href="https://norcalcarbmobile.com/blog/carb-exemptions-explained" target="_blank" rel="noopener">Understanding CARB exemptions and extensions</a></p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>If I test early (90 days before my due date), when is my next test due?</span>
-                    <span class="faq-icon">▼</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Great question! When you complete your CARB inspection <strong>before</strong> your scheduled due date, your next inspection date is still calculated from your <strong>original due date</strong>, not from the date you tested early.</p>
-                    <p>Here's an example:</p>
-                    <ul>
-                        <li>Your original due date: June 1, 2024</li>
-                        <li>You test early on: March 1, 2024 (90 days before due date)</li>
-                        <li>Your next test will be due: December 1, 2024 (6 months from June 1st)</li>
-                        <li>NOT September 1, 2024 (which would be 6 months from March 1st)</li>
-                    </ul>
-                    <p><strong>Key benefit:</strong> Testing early gives you peace of mind and ensures compliance without penalizing you by shortening your inspection cycle. You maintain your regular inspection schedule while staying ahead of deadlines.</p>
-                    <p><a href="https://norcalcarbmobile.com/blog/carb-inspection-timing" target="_blank" rel="noopener">Learn more about CARB inspection timing and scheduling</a></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resources Section -->
-        <div id="resources-section" class="container">
-            <h2>CARB Compliance Resources</h2>
-
-            <div class="resource-card">
-                <h3>🚛 NorCal CARB Mobile Services</h3>
-                <p>Professional mobile CARB inspection and compliance services throughout Northern California. We bring certified inspections directly to your location, saving you time and ensuring compliance.</p>
-                <a href="https://norcalcarbmobile.com" class="resource-link" target="_blank" rel="noopener">
-                    Visit NorCal CARB Mobile <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="resource-card">
-                <h3>📚 CARB Compliance Blog</h3>
-                <p>Stay updated with the latest CARB regulations, compliance tips, and industry news. Our blog covers everything from ACT regulations to HVIP funding opportunities.</p>
-                <a href="https://norcalcarbmobile.com/blog" class="resource-link" target="_blank" rel="noopener">
-                    Read Our Blog <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="resource-card">
-                <h3>🔧 DPF Services & Installation</h3>
-                <p>Expert diesel particulate filter installation, cleaning, and maintenance. We work with CARB-verified DPF systems to ensure your truck meets all emissions requirements.</p>
-                <a href="https://norcalcarbmobile.com/services/dpf" class="resource-link" target="_blank" rel="noopener">
-                    DPF Services <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="resource-card">
-                <h3>✅ CARB Inspection Services</h3>
-                <p>Comprehensive CARB compliance inspections performed by certified technicians. Get your compliance certificate quickly and ensure your fleet meets all California requirements.</p>
-                <a href="https://norcalcarbmobile.com/services/inspection" class="resource-link" target="_blank" rel="noopener">
-                    Schedule Inspection <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="resource-card">
-                <h3>💰 HVIP Funding Assistance</h3>
-                <p>Navigate the HVIP voucher process with expert guidance. We help you understand eligibility, application requirements, and maximize your incentive funding.</p>
-                <a href="https://norcalcarbmobile.com/services/hvip-assistance" class="resource-link" target="_blank" rel="noopener">
-                    HVIP Funding Help <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="resource-card">
-                <h3>📞 Contact for Compliance Support</h3>
-                <p>Have questions about CARB compliance? Our team of experts is here to help. Get personalized advice for your specific fleet and compliance situation.</p>
-                <a href="https://norcalcarbmobile.com/contact" class="resource-link" target="_blank" rel="noopener">
-                    Contact Us <span class="external-icon">↗</span>
-                </a>
-            </div>
-
-            <div class="info" style="margin-top: 30px;">
-                <h3>Official CARB Resources</h3>
-                <p>For official information, visit the <a href="https://ww2.arb.ca.gov/our-work/programs/truck-and-bus-regulation" target="_blank" rel="noopener">California Air Resources Board website</a>.</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed'));
-        }
-
-        // Tab Navigation
-        function showTab(tabName) {
-            // Hide all sections
-            document.querySelectorAll('.container').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Remove active class from all tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Show selected section
-            document.getElementById(tabName + '-section').classList.add('active');
-
-            // Activate clicked tab
-            event.target.classList.add('active');
-
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // FAQ Toggle
-        function toggleFAQ(button) {
-            const answer = button.nextElementSibling;
-            const isActive = button.classList.contains('active');
-
-            // Close all FAQs
-            document.querySelectorAll('.faq-question').forEach(q => {
-                q.classList.remove('active');
-                q.nextElementSibling.classList.remove('active');
-            });
-
-            // Toggle clicked FAQ
-            if (!isActive) {
-                button.classList.add('active');
-                answer.classList.add('active');
-            }
-        }
-
-        // VIN Form Handling
-        document.getElementById('vinForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const vin = document.getElementById('vin').value.trim().toUpperCase();
-            const resultDiv = document.getElementById('result');
-
-            // Basic VIN validation
-            if (vin.length !== 17) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = 'Invalid VIN: Must be exactly 17 characters';
-                return;
-            }
-
-            // VIN format validation (no I, O, Q allowed)
-            if (/[IOQ]/.test(vin)) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = 'Invalid VIN: Cannot contain letters I, O, or Q';
-                return;
-            }
-
-            // Simulate check (in production, this would call an API)
-            resultDiv.className = 'result success';
-            resultDiv.innerHTML = `VIN ${vin} has been submitted for compliance check. In production, this would verify against CARB database.<br><br>For professional inspection services, visit <a href="https://norcalcarbmobile.com" target="_blank" rel="noopener">NorCal CARB Mobile</a>.`;
-
-            // Clear form
-            setTimeout(() => {
-                document.getElementById('vin').value = '';
-            }, 5000);
-        });
-
-        // Auto-uppercase VIN input
-        document.getElementById('vin').addEventListener('input', function(e) {
-            e.target.value = e.target.value.toUpperCase();
-        });
-    </script>
+        <p id="vin-error" class="error-text" hidden>
+          VIN must be 17 characters with last 6 digits numeric.
+        </p>
+      </div>
+
+      <!-- CHECK COMPLIANCE -->
+      <button
+        class="btn btn-primary btn-full"
+        id="check-compliance-btn"
+        type="button"
+        disabled
+      >
+        Check Compliance
+      </button>
+
+      <!-- FIND A TESTER (inside main card) -->
+      <button
+        class="btn btn-secondary btn-full"
+        id="find-tester-btn"
+        type="button"
+      >
+        <span class="btn-text">
+          <span class="btn-title">Find a Tester</span>
+          <span class="btn-subtitle">Enter ZIP to find testers near you</span>
+        </span>
+      </button>
+    </section>
+
+    <!-- FOOTER TEXT -->
+    <footer class="app-footer">
+      <p class="footer-text">
+        CARB Clean Truck Check · NorCal CARB Mobile
+      </p>
+    </footer>
+  </main>
+
+  <!-- JS: keeps VIN validation, but calls your existing back-end when valid -->
+  <script src="/app.js"></script>
 </body>
 </html>
