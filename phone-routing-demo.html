@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARB Phone Routing - County Lookup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #dc2626;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .lookup-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            background: #d1fae5;
+            border: 2px solid #059669;
+        }
+
+        .phone-display {
+            font-size: 32px;
+            font-weight: 700;
+            color: #059669;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+
+        .region-display {
+            text-align: center;
+            color: #065f46;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .call-button {
+            background: #059669;
+            margin-top: 15px;
+        }
+
+        .call-button:hover {
+            background: #047857;
+        }
+
+        .county-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .county-table th,
+        .county-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .county-table th {
+            background: #f9fafb;
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .county-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .region-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .region-coastal {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .region-inland {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #dc2626;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CARB Phone Routing System</h1>
+        <p class="subtitle">County-based phone number lookup for Northern California</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('lookup')">County Lookup</button>
+            <button class="tab" onclick="switchTab('list')">Full County List</button>
+        </div>
+
+        <!-- Lookup Tab -->
+        <div id="lookup-tab" class="tab-content active">
+            <div class="lookup-section">
+                <label for="county-input">Enter County Name:</label>
+                <input
+                    type="text"
+                    id="county-input"
+                    placeholder="e.g., Sacramento, San Francisco, Fresno"
+                    list="county-list"
+                >
+                <datalist id="county-list"></datalist>
+                <button onclick="lookupPhone()">Find Phone Number</button>
+            </div>
+
+            <div class="lookup-section">
+                <label for="county-select">Or Select from Dropdown:</label>
+                <select id="county-select" onchange="lookupPhoneFromSelect()">
+                    <option value="">-- Select a County --</option>
+                </select>
+            </div>
+
+            <div id="result" class="result">
+                <div class="region-display" id="region-display"></div>
+                <div class="phone-display" id="phone-display"></div>
+                <button class="call-button" id="call-button" onclick="callPhone()">
+                    📞 Call This Number
+                </button>
+            </div>
+        </div>
+
+        <!-- List Tab -->
+        <div id="list-tab" class="tab-content">
+            <table class="county-table">
+                <thead>
+                    <tr>
+                        <th>County</th>
+                        <th>Phone Number</th>
+                        <th>Region</th>
+                    </tr>
+                </thead>
+                <tbody id="county-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="phone-routing.js"></script>
+    <script>
+        // Populate county datalist and select dropdown
+        function populateCountyOptions() {
+            const mappings = getAllCountyPhoneMappings();
+            const datalist = document.getElementById('county-list');
+            const select = document.getElementById('county-select');
+
+            mappings.forEach(mapping => {
+                // Datalist
+                const option = document.createElement('option');
+                option.value = mapping.county;
+                datalist.appendChild(option);
+
+                // Select dropdown
+                const selectOption = document.createElement('option');
+                selectOption.value = mapping.county;
+                selectOption.textContent = mapping.county;
+                select.appendChild(selectOption);
+            });
+        }
+
+        // Populate county table
+        function populateCountyTable() {
+            const mappings = getAllCountyPhoneMappings();
+            const tbody = document.getElementById('county-table-body');
+
+            mappings.forEach(mapping => {
+                const row = document.createElement('tr');
+
+                const countyCell = document.createElement('td');
+                countyCell.textContent = mapping.county;
+
+                const phoneCell = document.createElement('td');
+                phoneCell.textContent = formatPhoneNumber(mapping.phone);
+
+                const regionCell = document.createElement('td');
+                const badge = document.createElement('span');
+                badge.className = 'region-badge ' +
+                    (mapping.region.includes('Inland') ? 'region-inland' : 'region-coastal');
+                badge.textContent = mapping.region;
+                regionCell.appendChild(badge);
+
+                row.appendChild(countyCell);
+                row.appendChild(phoneCell);
+                row.appendChild(regionCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Lookup phone number
+        let currentPhone = '';
+
+        function lookupPhone() {
+            const countyInput = document.getElementById('county-input');
+            const county = countyInput.value.trim();
+
+            if (!county) {
+                alert('Please enter a county name');
+                return;
+            }
+
+            displayResult(county);
+        }
+
+        function lookupPhoneFromSelect() {
+            const select = document.getElementById('county-select');
+            const county = select.value;
+
+            if (!county) {
+                document.getElementById('result').classList.remove('show');
+                return;
+            }
+
+            displayResult(county);
+        }
+
+        function displayResult(county) {
+            const phone = getPhoneForCounty(county);
+            const mappings = getAllCountyPhoneMappings();
+            const mapping = mappings.find(m => m.county === county);
+
+            const region = mapping ? mapping.region :
+                (phone === PHONE_COAST ? 'Coastal' :
+                 phone === PHONE_INLAND_NORTH ? 'Inland North' : 'Other');
+
+            currentPhone = phone;
+
+            document.getElementById('phone-display').textContent = formatPhoneNumber(phone);
+            document.getElementById('region-display').textContent = `${county} County - ${region}`;
+            document.getElementById('result').classList.add('show');
+        }
+
+        function callPhone() {
+            if (currentPhone) {
+                window.location.href = `tel:${currentPhone}`;
+            }
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Initialize
+        populateCountyOptions();
+        populateCountyTable();
+    </script>
+</body>
+</html>
