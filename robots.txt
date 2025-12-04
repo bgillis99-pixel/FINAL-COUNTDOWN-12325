@@ -1,0 +1,18 @@
+# robots.txt for carbcleantruckcheck.app
+
+User-agent: *
+Allow: /
+Disallow: /sw.js
+
+# Sitemap location
+Sitemap: https://carbcleantruckcheck.app/sitemap.xml
+
+# Common crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
