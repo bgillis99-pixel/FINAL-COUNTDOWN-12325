@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CARB Clean Truck Check - VIN Validator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>CARB Clean Truck Check</h1>
+      <p class="subtitle">VIN Validation & Compliance Checker</p>
+    </header>
+
+    <main>
+      <div class="vin-checker-card">
+        <h2>Check Your Vehicle</h2>
+
+        <div class="input-group">
+          <label for="vin-input">Enter VIN Number</label>
+          <input
+            type="text"
+            id="vin-input"
+            placeholder="Enter 17-character VIN"
+            maxlength="17"
+            autocomplete="off"
+          >
+          <div class="input-footer">
+            <span id="vin-char-count" class="char-count">0 / 17</span>
+            <span id="vin-error" class="error-message" hidden>
+              ⚠️ Invalid VIN: Last 6 characters must be numeric
+            </span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="check-compliance-btn" class="btn btn-primary" disabled>
+            Check Compliance
+          </button>
+          <button id="scan-vin-btn" class="btn btn-secondary">
+            📷 Scan VIN
+          </button>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Need Help?</h3>
+        <p>Find a certified testing center near you</p>
+        <button id="find-tester-btn" class="btn btn-outline">
+          Find a Tester
+        </button>
+      </div>
+    </main>
+
+    <footer>
+      <p>CARB Clean Truck Check - Ensuring California Air Quality Standards</p>
+    </footer>
+  </div>
+
+  <!-- Sticky CTA Button -->
+  <button id="sticky-cta-btn" class="sticky-cta">
+    Find a Testing Center
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
