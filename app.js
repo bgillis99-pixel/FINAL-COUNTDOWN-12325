@@ -1,356 +1,244 @@
-/**
- * CARB Clean Truck Check - VIN Validation Application
- * Validates Vehicle Identification Numbers (VINs) for compliance checking
- */
+document.addEventListener('DOMContentLoaded', () => {
+    /******************************
+     * PHONE ROUTING CONFIG
+     ******************************/
 
-// ============================
-// DOM Elements
-// ============================
-const vinInput = document.getElementById('vin-input');
-const vinCharCount = document.getElementById('vin-char-count');
-const vinError = document.getElementById('vin-error');
-const checkComplianceBtn = document.getElementById('check-compliance-btn');
-const scanVinBtn = document.getElementById('scan-vin-btn');
-const findTesterBtn = document.getElementById('find-tester-btn');
+    // Core phones
+    const PHONE_DEFAULT = "617-359-6953"; // fallback / for now
+    const PHONE_INLAND_NORTH = "916-890-4427";
+    const PHONE_COAST = "415-900-8563";
 
-// ============================
-// Constants
-// ============================
-const VIN_LENGTH = 17;
-const VIN_LAST_DIGITS = 6;
+    // Coastal band: Monterey → Fort Bragg, inland to Richmond.
+    // Adjust this list as needed – it’s intentionally explicit.
+    const COASTAL_COUNTIES = new Set([
+        "Monterey",
+        "San Benito",
+        "Santa Cruz",
+        "Santa Clara", // south bay
+        "San Mateo",
+        "San Francisco",
+        "Marin",
+        "Sonoma",
+        "Mendocino" // up to Fort Bragg
+    ]);
 
-// ============================
-// VIN Validation Logic
-// ============================
+    // Inland counties that should still route to the COAST number because
+    // they're "inland to Richmond" (Bay inner ring)
+    const COASTAL_INLAND_TO_RICHMOND = new Set([
+        "Alameda",
+        "Contra Costa" // includes Richmond
+    ]);
 
-/**
- * Validates if a VIN meets CARB requirements
- * - Must be exactly 17 characters
- * - Last 6 characters must be numeric
- * @param {string} vin - The VIN to validate
- * @returns {boolean} - True if valid, false otherwise
- */
-function isValidVIN(vin) {
-  if (!vin || vin.length !== VIN_LENGTH) {
-    return false;
-  }
+    // Counties that are Fresno and north / east to Nevada get the 916 number.
+    // This is not exhaustive – your dev can expand.
+    const INLAND_NORTH_COUNTIES = new Set([
+        "Fresno",
+        "Madera",
+        "Merced",
+        "Stanislaus",
+        "San Joaquin",
+        "Sacramento",
+        "Solano",
+        "Yolo",
+        "Placer",
+        "El Dorado",
+        "Nevada",
+        "Sutter",
+        "Yuba",
+        "Butte",
+        "Colusa",
+        "Glenn",
+        "Tehama",
+        "Shasta",
+        "Plumas",
+        "Sierra",
+        "Lassen",
+        "Modoc",
+        "Trinity",
+        "Humboldt", // you can argue this is coastal – pick one
+        "Lake"
+    ]);
 
-  // Extract last 6 characters
-  const lastSix = vin.slice(-VIN_LAST_DIGITS);
+    /**
+     * Decide which phone number to use based on county.
+     * countyName: string like "Sacramento"
+     */
+    function getPhoneForCounty(countyName) {
+        if (!countyName) return PHONE_DEFAULT;
 
-  // Check if last 6 characters are all digits
-  const isNumeric = /^\d{6}$/.test(lastSix);
-
-  return isNumeric;
-}
-
-/**
- * Sanitizes VIN input by removing invalid characters
- * VINs typically exclude I, O, Q to avoid confusion with 1, 0
- * @param {string} value - The input value
- * @returns {string} - Sanitized VIN
- */
-function sanitizeVIN(value) {
-  // Convert to uppercase and remove spaces
-  return value.toUpperCase().replace(/\s/g, '');
-}
-
-// ============================
-// UI Update Functions
-// ============================
-
-/**
- * Updates the character count display
- * @param {number} count - Current character count
- */
-function updateCharCount(count) {
-  vinCharCount.textContent = `${count} / ${VIN_LENGTH}`;
-
-  // Visual feedback for character count
-  if (count === 0) {
-    vinCharCount.style.color = 'var(--gray-600)';
-  } else if (count === VIN_LENGTH) {
-    vinCharCount.style.color = 'var(--success-green)';
-    vinCharCount.style.fontWeight = '700';
-  } else {
-    vinCharCount.style.color = 'var(--primary-blue)';
-    vinCharCount.style.fontWeight = '600';
-  }
-}
-
-/**
- * Shows or hides the error message
- * @param {boolean} show - Whether to show the error
- */
-function toggleError(show) {
-  if (show) {
-    vinError.hidden = false;
-    vinInput.classList.add('error');
-  } else {
-    vinError.hidden = true;
-    vinInput.classList.remove('error');
-  }
-}
-
-/**
- * Enables or disables the check compliance button
- * @param {boolean} enabled - Whether the button should be enabled
- */
-function toggleCheckButton(enabled) {
-  checkComplianceBtn.disabled = !enabled;
-}
-
-/**
- * Validates and updates UI based on current VIN input
- */
-function validateAndUpdate() {
-  const vin = vinInput.value;
-  const length = vin.length;
-
-  // Update character count
-  updateCharCount(length);
-
-  // Validate VIN
-  if (length === 0) {
-    // No input - hide error, disable button
-    toggleError(false);
-    toggleCheckButton(false);
-  } else if (length === VIN_LENGTH) {
-    // Full length - validate format
-    const valid = isValidVIN(vin);
-    toggleError(!valid);
-    toggleCheckButton(valid);
-  } else {
-    // Partial input - hide error, disable button
-    toggleError(false);
-    toggleCheckButton(false);
-  }
-}
-
-// ============================
-// Event Handlers
-// ============================
-
-/**
- * Handles VIN input changes
- * @param {Event} e - Input event
- */
-function handleVINInput(e) {
-  // Sanitize input
-  const sanitized = sanitizeVIN(e.target.value);
-
-  // Update input if sanitization changed the value
-  if (sanitized !== e.target.value) {
-    vinInput.value = sanitized;
-  }
-
-  // Validate and update UI
-  validateAndUpdate();
-}
-
-/**
- * Handles VIN input paste events
- * @param {ClipboardEvent} e - Paste event
- */
-function handleVINPaste(e) {
-  e.preventDefault();
-
-  // Get pasted text
-  const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-
-  // Sanitize and truncate to max length
-  const sanitized = sanitizeVIN(pastedText).slice(0, VIN_LENGTH);
-
-  // Set input value
-  vinInput.value = sanitized;
-
-  // Validate and update UI
-  validateAndUpdate();
-}
-
-/**
- * Handles scan VIN button click
- */
-async function handleScanVIN() {
-  console.log('Scan VIN clicked');
-
-  // Check if browser supports camera access
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert('Camera access is not supported in this browser. Please enter VIN manually.');
-    return;
-  }
-
-  try {
-    // Request camera permission
-    // This is a placeholder - actual VIN scanning would require
-    // integration with a barcode/OCR library like QuaggaJS or Tesseract.js
-    alert('VIN scanning feature coming soon!\n\nFor now, please enter the VIN manually.');
-
-    // Future implementation would:
-    // 1. Request camera access
-    // 2. Open camera view
-    // 3. Use OCR/barcode scanning library
-    // 4. Extract VIN from image
-    // 5. Populate input field
-
-  } catch (error) {
-    console.error('Error accessing camera:', error);
-    alert('Unable to access camera. Please check permissions and try again.');
-  }
-}
-
-/**
- * Handles check compliance button click
- */
-async function handleCheckCompliance() {
-  const vin = vinInput.value;
-
-  if (!isValidVIN(vin)) {
-    alert('Please enter a valid 17-character VIN with last 6 digits numeric.');
-    return;
-  }
-
-  console.log('Checking compliance for VIN:', vin);
-
-  // Show loading state
-  checkComplianceBtn.textContent = 'Checking...';
-  checkComplianceBtn.disabled = true;
-
-  try {
-    // Placeholder for API call to CARB compliance database
-    // In production, this would call an actual API endpoint
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-
-    // Simulated response
-    const isCompliant = Math.random() > 0.5; // Random result for demo
-
-    if (isCompliant) {
-      alert(`✅ VIN ${vin} is COMPLIANT\n\nThis vehicle meets CARB clean truck requirements.`);
-    } else {
-      alert(`⚠️ VIN ${vin} requires inspection\n\nThis vehicle may need testing. Click "Find a Tester" to locate nearby certified testers.`);
+        const c = countyName.trim();
+        if (COASTAL_COUNTIES.has(c) || COASTAL_INLAND_TO_RICHMOND.has(c)) {
+            return PHONE_COAST;
+        }
+        if (INLAND_NORTH_COUNTIES.has(c)) {
+            return PHONE_INLAND_NORTH;
+        }
+        // Fallback "for now"
+        return PHONE_DEFAULT;
     }
 
-  } catch (error) {
-    console.error('Error checking compliance:', error);
-    alert('Unable to check compliance. Please try again later.');
-  } finally {
-    // Restore button state
-    checkComplianceBtn.textContent = 'Check Compliance';
-    checkComplianceBtn.disabled = false;
-  }
-}
 
-/**
- * Handles find tester button click
- */
-function handleFindTester() {
-  console.log('Find tester clicked');
+    /**
+     * Look up county by ZIP.
+     * For now this is a stub – dev should replace with real implementation
+     * (local JSON map or API call).
+     */
+    async function lookupCountyByZip(zip) {
+        const cleanZip = (zip || "").trim();
+        if (!/^[0-9]{5}$/.test(cleanZip)) {
+            throw new Error("Invalid ZIP");
+        }
 
-  // Prompt for ZIP code
-  const zip = prompt('Enter your ZIP code to find certified testers near you:');
+        // TODO: REPLACE with real data
+        // Example shape if using a local map:
+        // const county = ZIP_TO_COUNTY[cleanZip];
+        // if (!county) throw new Error("ZIP not found");
+        // return { zip: cleanZip, county };
 
-  if (!zip) {
-    return; // User cancelled
-  }
+        // Temporary placeholder for testing:
+        return {
+            zip: cleanZip,
+            county: "Sacramento"
+        };
+    }
 
-  // Validate ZIP code (basic 5-digit validation)
-  const zipPattern = /^\d{5}$/;
-  if (!zipPattern.test(zip)) {
-    alert('Please enter a valid 5-digit ZIP code.');
-    return;
-  }
 
-  console.log('Finding testers near ZIP:', zip);
+    // Grab elements
+    const vinInput = document.getElementById("vin-input");
+    const charCountEl = document.getElementById("vin-char-count");
+    const errorEl = document.getElementById("vin-error");
+    const checkBtn = document.getElementById("check-compliance-btn");
+    const scanBtn = document.getElementById("scan-vin-btn");
+    const findTesterBtn = document.getElementById("find-tester-btn");
+    const stickyCtaBtn = document.getElementById("sticky-cta-btn");
+    const zipInput = document.getElementById("zip-input");
 
-  // Placeholder for tester search functionality
-  // In production, this would:
-  // 1. Call an API to find nearby testers
-  // 2. Display results in a modal or new page
-  // 3. Show tester details (name, address, phone, distance)
+    // Basic validation (front-end only)
+    function validateVin(raw) {
+        const vin = raw.trim().toUpperCase();
+        const len = vin.length;
+        let lastSixNumeric = false;
 
-  alert(`Searching for certified CARB testers near ${zip}...\n\nThis feature is coming soon!\n\nFor now, visit ww2.arb.ca.gov/our-work/programs/heavy-duty-inspection-and-maintenance-program to find testers.`);
-}
+        if (len === 17) {
+            const lastSix = vin.slice(-6);
+            lastSixNumeric = /^[0-9]{6}$/.test(lastSix);
+        }
 
-// ============================
-// Event Listeners
-// ============================
+        return {
+            vin,
+            length: len,
+            isValid: len === 17 && lastSixNumeric
+        };
+    }
 
-// VIN input events
-vinInput.addEventListener('input', handleVINInput);
-vinInput.addEventListener('paste', handleVINPaste);
+    function updateVinUI() {
+        const {
+            length,
+            isValid
+        } = validateVin(vinInput.value);
+        if (charCountEl) {
+            charCountEl.textContent = `${length} / 17`;
+        }
+        if (checkBtn) {
+            checkBtn.disabled = !isValid;
+        }
 
-// Button click events
-scanVinBtn.addEventListener('click', handleScanVIN);
-checkComplianceBtn.addEventListener('click', handleCheckCompliance);
-findTesterBtn.addEventListener('click', handleFindTester);
+        if (!vinInput.value) {
+            errorEl.hidden = true;
+        } else if (length === 17 && !isValid) {
+            errorEl.hidden = false;
+        } else {
+            errorEl.hidden = true;
+        }
+    }
 
-// ============================
-// Keyboard Shortcuts
-// ============================
+    if (vinInput) {
+        vinInput.addEventListener("input", updateVinUI);
+    }
 
-// Allow Enter key to check compliance when VIN is valid
-vinInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter' && !checkComplianceBtn.disabled) {
-    handleCheckCompliance();
-  }
+    // TODO: Replace the placeholders below with your existing working logic.
+    function existingVinLookup(vin) {
+        // Hook this into whatever you currently use on carbcleantruckcheck.app
+        console.log("VIN lookup:", vin);
+    }
+
+    function existingFindTesterFlow() {
+        // Hook into your current "Find a Tester" flow / page
+        console.log("Find tester flow");
+    }
+
+    // Wire buttons to existing logic
+    if (checkBtn) {
+        checkBtn.addEventListener("click", () => {
+            const {
+                vin,
+                isValid
+            } = validateVin(vinInput.value);
+            if (!isValid) return;
+            existingVinLookup(vin);
+        });
+    }
+
+    if (scanBtn) {
+        scanBtn.addEventListener("click", () => {
+            // Call your existing Scan-VIN function
+            console.log("Scan VIN pressed");
+        });
+    }
+
+    if (findTesterBtn) {
+        findTesterBtn.addEventListener("click", existingFindTesterFlow);
+    }
+
+    if (stickyCtaBtn) {
+        stickyCtaBtn.addEventListener("click", existingFindTesterFlow);
+    }
+
+    const zipError = document.getElementById("zip-error");
+    const zipSubmitBtn = document.getElementById("zip-submit-btn");
+    const testerResult = document.getElementById("tester-result");
+    const testerCountyLine = document.getElementById("tester-county-line");
+    const testerPhoneLine = document.getElementById("tester-phone-line");
+    const testerCallLink = document.getElementById("tester-call-link");
+
+    async function handleFindTesterZip() {
+        if (!zipInput) return;
+
+        const zip = zipInput.value.trim();
+        if (!/^[0-9]{5}$/.test(zip)) {
+            zipError.hidden = false;
+            testerResult.hidden = true;
+            return;
+        }
+        zipError.hidden = true;
+
+        try {
+            // 1) Look up county
+            const {
+                county
+            } = await lookupCountyByZip(zip);
+
+            // 2) Pick phone number
+            const phone = getPhoneForCounty(county);
+
+            // 3) Update UI
+            testerCountyLine.textContent = `ZIP ${zip} is in ${county} County.`;
+            testerPhoneLine.textContent = `Your NorCal contact: ${phone}`;
+            testerCallLink.href = `tel:${phone.replace(/[^0-9+]/g, "")}`;
+
+            testerResult.hidden = false;
+
+            // 4) Optional: send event to your existing system
+            // existingFindTesterFlow(zip, county, phone);
+        } catch (err) {
+            console.error(err);
+            zipError.textContent = "We couldn't look up that ZIP. Please try again.";
+            zipError.hidden = false;
+            testerResult.hidden = true;
+        }
+    }
+
+    if (zipSubmitBtn) {
+        zipSubmitBtn.addEventListener("click", handleFindTesterZip);
+    }
 });
-
-// ============================
-// Initialization
-// ============================
-
-/**
- * Initialize the application
- */
-function init() {
-  console.log('CARB Clean Truck Check initialized');
-
-  // Set initial state
-  updateCharCount(0);
-  toggleCheckButton(false);
-  toggleError(false);
-
-  // Focus on VIN input for better UX
-  vinInput.focus();
-}
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-
-// ============================
-// Utility Functions
-// ============================
-
-/**
- * Decodes a VIN to extract vehicle information
- * This is a simplified version - real VIN decoding is more complex
- * @param {string} vin - The VIN to decode
- * @returns {object} - Decoded VIN information
- */
-function decodeVIN(vin) {
-  if (!vin || vin.length !== VIN_LENGTH) {
-    return null;
-  }
-
-  return {
-    wmi: vin.substring(0, 3),        // World Manufacturer Identifier
-    vds: vin.substring(3, 9),        // Vehicle Descriptor Section
-    vis: vin.substring(9, 17),       // Vehicle Identifier Section
-    year: vin.charAt(9),             // Model Year
-    plant: vin.charAt(10),           // Manufacturing Plant
-    serial: vin.substring(11, 17)    // Serial Number
-  };
-}
-
-// Export functions for testing (if using modules)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    isValidVIN,
-    sanitizeVIN,
-    decodeVIN
-  };
-}

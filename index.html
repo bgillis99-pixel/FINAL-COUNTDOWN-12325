@@ -96,17 +96,38 @@
         Check Compliance
       </button>
 
-      <!-- FIND A TESTER (inside main card) -->
+      <div class="section-divider"></div>
+
+      <!-- FIND A TESTER (ZIP-based) -->
+      <div class="form-group">
+        <label for="zip-input" class="field-label">Enter ZIP code</label>
+        <input
+          id="zip-input"
+          type="text"
+          maxlength="5"
+          inputmode="numeric"
+          class="field-input"
+          placeholder="95814"
+        />
+        <p id="zip-error" class="error-text" hidden>Enter a valid 5-digit ZIP.</p>
+      </div>
+
       <button
         class="btn btn-secondary btn-full"
-        id="find-tester-btn"
+        id="zip-submit-btn"
         type="button"
       >
-        <span class="btn-text">
-          <span class="btn-title">Find a Tester</span>
-          <span class="btn-subtitle">Enter ZIP to find testers near you</span>
-        </span>
+        Find Tester
       </button>
+
+      <div id="tester-result" class="tester-result" hidden>
+        <div class="section-divider"></div>
+        <p id="tester-county-line"></p>
+        <p id="tester-phone-line"></p>
+        <a id="tester-call-link" class="btn btn-primary btn-full" href="#">
+          Call Now
+        </a>
+      </div>
     </section>
 
     <!-- FOOTER TEXT -->
