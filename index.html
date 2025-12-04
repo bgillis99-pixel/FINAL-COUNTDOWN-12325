@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CARB Clean Truck Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <!-- HEADER -->
+    <header class="app-header">
+      <img
+        src="/logo.svg"
+        alt="CARB Clean Truck Check logo"
+        class="app-logo"
+      />
+      <h1 class="app-title">Clean Truck VIN Check</h1>
+    </header>
+
+    <!-- MAIN CARD -->
+    <section class="app-card">
+
+      <!-- PRIMARY CTA: SCAN VIN -->
+      <button class="btn btn-primary btn-full" id="scan-vin-btn" type="button">
+        <span class="btn-icon" aria-hidden="true">📷</span>
+        <span class="btn-text">
+          <span class="btn-title">Scan VIN</span>
+          <span class="btn-subtitle">Use your camera to scan VIN</span>
+        </span>
+      </button>
+
+      <div class="section-divider"></div>
+
+      <!-- MANUAL VIN ENTRY -->
+      <div class="form-group">
+        <label for="vin-input" class="field-label">Enter VIN (17 characters)</label>
+        <input
+          id="vin-input"
+          name="vin"
+          type="text"
+          maxlength="17"
+          autocomplete="off"
+          class="field-input"
+          inputmode="text"
+          placeholder="1XPTP4EX5DD181493"
+        />
+        <div class="field-meta">
+          <span id="vin-char-count" class="char-count">0 / 17</span>
+          <span class="helper-text">Last 6 characters must be numbers</span>
+        </div>
+        <p id="vin-error" class="error-text" hidden>
+          VIN must be 17 characters with last 6 digits numeric.
+        </p>
+      </div>
+
+      <!-- CHECK COMPLIANCE BUTTON -->
+      <button
+        class="btn btn-primary btn-full"
+        id="check-compliance-btn"
+        type="button"
+        disabled
+      >
+        Check Compliance
+      </button>
+
+      <!-- FIND TESTER BUTTON -->
+      <button
+        class="btn btn-secondary btn-full btn-outline"
+        id="find-tester-btn"
+        type="button"
+      >
+        <span class="btn-text">
+          <span class="btn-title">Find a Tester</span>
+          <span class="btn-subtitle">Enter ZIP to find testers near you</span>
+        </span>
+      </button>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <p class="footer-text">
+        CARB Clean Truck Check · NorCal CARB Mobile
+      </p>
+    </footer>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
