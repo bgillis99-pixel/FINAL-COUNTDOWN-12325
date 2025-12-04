@@ -1,79 +1,99 @@
-// Grab elements
-const vinInput = document.getElementById("vin-input");
-const charCountEl = document.getElementById("vin-char-count");
-const errorEl = document.getElementById("vin-error");
-const checkBtn = document.getElementById("check-compliance-btn");
-const scanBtn = document.getElementById("scan-vin-btn");
-const findTesterBtn = document.getElementById("find-tester-btn");
-const stickyCtaBtn = document.getElementById("sticky-cta-btn");
+// Default target date (New Year 2026)
+let targetDate = new Date('2026-01-01T00:00:00').getTime();
 
-// Basic validation (front-end only)
-function validateVin(raw) {
-  const vin = raw.trim().toUpperCase();
-  const len = vin.length;
-  let lastSixNumeric = false;
-
-  if (len === 17) {
-    const lastSix = vin.slice(-6);
-    lastSixNumeric = /^[0-9]{6}$/.test(lastSix);
-  }
-
-  return {
-    vin,
-    length: len,
-    isValid: len === 17 && lastSixNumeric
-  };
+// Load saved date from localStorage if available
+const savedDate = localStorage.getItem('countdownTarget');
+if (savedDate) {
+    targetDate = parseInt(savedDate);
 }
 
-function updateVinUI() {
-  const { length, isValid } = validateVin(vinInput.value);
-  charCountEl.textContent = `${length} / 17`;
-  checkBtn.disabled = !isValid;
+// Elements
+const daysEl = document.getElementById('days');
+const hoursEl = document.getElementById('hours');
+const minutesEl = document.getElementById('minutes');
+const secondsEl = document.getElementById('seconds');
+const targetDisplay = document.getElementById('target-display');
+const datePicker = document.getElementById('date-picker');
+const setDateBtn = document.getElementById('set-date');
 
-  if (!vinInput.value) {
-    errorEl.hidden = true;
-  } else if (length === 17 && !isValid) {
-    errorEl.hidden = false;
-  } else {
-    errorEl.hidden = true;
-  }
+// Format number to always show two digits
+function formatTime(time) {
+    return time < 10 ? `0${time}` : time;
 }
 
-if (vinInput) {
-  vinInput.addEventListener("input", updateVinUI);
+// Update countdown display
+function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance < 0) {
+        daysEl.textContent = '00';
+        hoursEl.textContent = '00';
+        minutesEl.textContent = '00';
+        secondsEl.textContent = '00';
+        return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    daysEl.textContent = formatTime(days);
+    hoursEl.textContent = formatTime(hours);
+    minutesEl.textContent = formatTime(minutes);
+    secondsEl.textContent = formatTime(seconds);
 }
 
-// TODO: Replace the placeholders below with your existing working logic.
-function existingVinLookup(vin) {
-  // Hook this into whatever you currently use on carbcleantruckcheck.app
-  console.log("VIN lookup:", vin);
+// Update target date display
+function updateTargetDisplay() {
+    const date = new Date(targetDate);
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    targetDisplay.textContent = date.toLocaleDateString('en-US', options);
 }
 
-function existingFindTesterFlow() {
-  // Hook into your current "Find a Tester" flow / page
-  console.log("Find tester flow");
+// Set up date picker with current target
+function initializeDatePicker() {
+    const date = new Date(targetDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    datePicker.value = `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-// Wire buttons to existing logic
-if (checkBtn) {
-  checkBtn.addEventListener("click", () => {
-    const { vin, isValid } = validateVin(vinInput.value);
-    if (!isValid) return;
-    existingVinLookup(vin);
-  });
-}
+// Handle date change
+setDateBtn.addEventListener('click', () => {
+    const newDate = new Date(datePicker.value).getTime();
 
-if (scanBtn) {
-  scanBtn.addEventListener("click", () => {
-    // Call your existing Scan-VIN function
-    console.log("Scan VIN pressed");
-  });
-}
+    if (isNaN(newDate)) {
+        alert('Please select a valid date and time');
+        return;
+    }
 
-if (findTesterBtn) {
-  findTesterBtn.addEventListener("click", existingFindTesterFlow);
-}
+    if (newDate <= new Date().getTime()) {
+        alert('Please select a future date and time');
+        return;
+    }
 
-if (stickyCtaBtn) {
-  stickyCtaBtn.addEventListener("click", existingFindTesterFlow);
-}
+    targetDate = newDate;
+    localStorage.setItem('countdownTarget', targetDate);
+    updateTargetDisplay();
+    updateCountdown();
+});
+
+// Initialize
+initializeDatePicker();
+updateTargetDisplay();
+updateCountdown();
+
+// Update every second
+setInterval(updateCountdown, 1000);
