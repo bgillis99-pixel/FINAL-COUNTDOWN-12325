@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CARB Clean Truck VIN Check - Verify California Air Resources Board compliance for commercial vehicles">
+    <meta name="theme-color" content="#dc2626">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CARB VIN">
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <title>Clean Truck VIN Check - CARB Compliance</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        h1 {
+            color: #dc2626;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            text-transform: uppercase;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Red Apple Logo -->
+            <circle cx="50" cy="55" r="35" fill="#dc2626"/>
+            <ellipse cx="50" cy="55" rx="35" ry="32" fill="#dc2626"/>
+            <path d="M 50 20 Q 45 25 45 30 L 45 35" stroke="#059669" stroke-width="3" fill="none"/>
+            <ellipse cx="52" cy="28" rx="8" ry="5" fill="#059669"/>
+            <path d="M 35 50 Q 32 52 30 55" stroke="#fff" stroke-width="2" fill="none" opacity="0.4"/>
+        </svg>
+
+        <h1>CARB VIN Check</h1>
+        <p class="subtitle">Clean Truck VIN Check - California Air Resources Board</p>
+
+        <form id="vinForm">
+            <div class="form-group">
+                <label for="vin">Enter Vehicle Identification Number (VIN)</label>
+                <input
+                    type="text"
+                    id="vin"
+                    name="vin"
+                    placeholder="e.g., 1HGBH41JXMN109186"
+                    maxlength="17"
+                    required
+                >
+            </div>
+
+            <button type="submit">Check Compliance</button>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <div class="info">
+            <h3>About CARB Compliance</h3>
+            <p>The California Air Resources Board (CARB) requires commercial trucks to meet specific emissions standards. Use this tool to verify your vehicle's compliance status.</p>
+        </div>
+    </div>
+
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+
+        // VIN Form Handling
+        document.getElementById('vinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const vin = document.getElementById('vin').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('result');
+
+            // Basic VIN validation
+            if (vin.length !== 17) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Invalid VIN: Must be exactly 17 characters';
+                return;
+            }
+
+            // VIN format validation (no I, O, Q allowed)
+            if (/[IOQ]/.test(vin)) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Invalid VIN: Cannot contain letters I, O, or Q';
+                return;
+            }
+
+            // Simulate check (in production, this would call an API)
+            resultDiv.className = 'result success';
+            resultDiv.textContent = `VIN ${vin} has been submitted for compliance check. In production, this would verify against CARB database.`;
+
+            // Clear form
+            setTimeout(() => {
+                document.getElementById('vin').value = '';
+            }, 3000);
+        });
+
+        // Auto-uppercase VIN input
+        document.getElementById('vin').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+</body>
+</html>
