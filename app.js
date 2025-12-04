@@ -112,88 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const findTesterBtn = document.getElementById("find-tester-btn");
     const stickyCtaBtn = document.getElementById("sticky-cta-btn");
     const zipInput = document.getElementById("zip-input");
-
-    // Basic validation (front-end only)
-    function validateVin(raw) {
-        const vin = raw.trim().toUpperCase();
-        const len = vin.length;
-        let lastSixNumeric = false;
-
-        if (len === 17) {
-            const lastSix = vin.slice(-6);
-            lastSixNumeric = /^[0-9]{6}$/.test(lastSix);
-        }
-
-        return {
-            vin,
-            length: len,
-            isValid: len === 17 && lastSixNumeric
-        };
-    }
-
-    function updateVinUI() {
-        const {
-            length,
-            isValid
-        } = validateVin(vinInput.value);
-        if (charCountEl) {
-            charCountEl.textContent = `${length} / 17`;
-        }
-        if (checkBtn) {
-            checkBtn.disabled = !isValid;
-        }
-
-        if (!vinInput.value) {
-            errorEl.hidden = true;
-        } else if (length === 17 && !isValid) {
-            errorEl.hidden = false;
-        } else {
-            errorEl.hidden = true;
-        }
-    }
-
-    if (vinInput) {
-        vinInput.addEventListener("input", updateVinUI);
-    }
-
-    // TODO: Replace the placeholders below with your existing working logic.
-    function existingVinLookup(vin) {
-        // Hook this into whatever you currently use on carbcleantruckcheck.app
-        console.log("VIN lookup:", vin);
-    }
-
-    function existingFindTesterFlow() {
-        // Hook into your current "Find a Tester" flow / page
-        console.log("Find tester flow");
-    }
-
-    // Wire buttons to existing logic
-    if (checkBtn) {
-        checkBtn.addEventListener("click", () => {
-            const {
-                vin,
-                isValid
-            } = validateVin(vinInput.value);
-            if (!isValid) return;
-            existingVinLookup(vin);
-        });
-    }
-
-    if (scanBtn) {
-        scanBtn.addEventListener("click", () => {
-            // Call your existing Scan-VIN function
-            console.log("Scan VIN pressed");
-        });
-    }
-
-    if (findTesterBtn) {
-        findTesterBtn.addEventListener("click", existingFindTesterFlow);
-    }
-
-    if (stickyCtaBtn) {
-        stickyCtaBtn.addEventListener("click", existingFindTesterFlow);
-    }
-
     const zipError = document.getElementById("zip-error");
     const zipSubmitBtn = document.getElementById("zip-submit-btn");
     const testerResult = document.getElementById("tester-result");
@@ -202,43 +120,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const testerCallLink = document.getElementById("tester-call-link");
 
     async function handleFindTesterZip() {
-        if (!zipInput) return;
+      if (!zipInput) return;
 
-        const zip = zipInput.value.trim();
-        if (!/^[0-9]{5}$/.test(zip)) {
-            zipError.hidden = false;
-            testerResult.hidden = true;
-            return;
-        }
-        zipError.hidden = true;
+      const zip = zipInput.value.trim();
+      if (!/^[0-9]{5}$/.test(zip)) {
+        zipError.hidden = false;
+        testerResult.hidden = true;
+        return;
+      }
+      zipError.hidden = true;
 
-        try {
-            // 1) Look up county
-            const {
-                county
-            } = await lookupCountyByZip(zip);
+      try {
+        // 1) Look up county
+        const { county } = await lookupCountyByZip(zip);
 
-            // 2) Pick phone number
-            const phone = getPhoneForCounty(county);
+        // 2) Pick phone number
+        const phone = getPhoneForCounty(county);
 
-            // 3) Update UI
-            testerCountyLine.textContent = `ZIP ${zip} is in ${county} County.`;
-            testerPhoneLine.textContent = `Your NorCal contact: ${phone}`;
-            testerCallLink.href = `tel:${phone.replace(/[^0-9+]/g, "")}`;
+        // 3) Update UI
+        testerCountyLine.textContent = `ZIP ${zip} is in ${county} County.`;
+        testerPhoneLine.textContent = `Your NorCal contact: ${phone}`;
+        testerCallLink.href = `tel:${phone.replace(/[^0-9+]/g, "")}`;
 
-            testerResult.hidden = false;
+        testerResult.hidden = false;
 
-            // 4) Optional: send event to your existing system
-            // existingFindTesterFlow(zip, county, phone);
-        } catch (err) {
-            console.error(err);
-            zipError.textContent = "We couldn't look up that ZIP. Please try again.";
-            zipError.hidden = false;
-            testerResult.hidden = true;
-        }
+        // 4) Optional: send event to your existing system
+        // existingFindTesterFlow(zip, county, phone);
+      } catch (err) {
+        console.error(err);
+        zipError.textContent = "We couldn't look up that ZIP. Please try again.";
+        zipError.hidden = false;
+        testerResult.hidden = true;
+      }
     }
 
     if (zipSubmitBtn) {
-        zipSubmitBtn.addEventListener("click", handleFindTesterZip);
+      zipSubmitBtn.addEventListener("click", handleFindTesterZip);
     }
+
 });
