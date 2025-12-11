@@ -158,4 +158,90 @@ document.addEventListener('DOMContentLoaded', () => {
       zipSubmitBtn.addEventListener("click", handleFindTesterZip);
     }
 
+    /******************************
+     * VIN INPUT VALIDATION
+     ******************************/
+
+    /**
+     * Validates VIN format:
+     * - Must be exactly 17 characters
+     * - Last 6 characters must be numeric
+     */
+    function validateVIN(vin) {
+        if (!vin || vin.length !== 17) {
+            return false;
+        }
+        // Last 6 characters must be numeric
+        const lastSix = vin.slice(-6);
+        return /^[0-9]{6}$/.test(lastSix);
+    }
+
+    /**
+     * Updates character count display
+     */
+    function updateCharCount() {
+        if (!vinInput || !charCountEl) return;
+
+        const length = vinInput.value.length;
+        charCountEl.textContent = `${length} / 17`;
+    }
+
+    /**
+     * Validates VIN and updates UI state
+     */
+    function handleVINInput() {
+        if (!vinInput || !errorEl || !checkBtn) return;
+
+        const vin = vinInput.value.toUpperCase().trim();
+        const isValid = validateVIN(vin);
+
+        // Update character count
+        updateCharCount();
+
+        // Show/hide error
+        if (vin.length > 0 && vin.length === 17 && !isValid) {
+            errorEl.hidden = false;
+            checkBtn.disabled = true;
+        } else {
+            errorEl.hidden = true;
+            checkBtn.disabled = !isValid;
+        }
+    }
+
+    // Add event listeners for VIN input
+    if (vinInput) {
+        vinInput.addEventListener("input", handleVINInput);
+        vinInput.addEventListener("paste", () => {
+            // Small delay to let paste complete
+            setTimeout(handleVINInput, 10);
+        });
+
+        // Normalize to uppercase as user types
+        vinInput.addEventListener("input", (e) => {
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            e.target.value = e.target.value.toUpperCase();
+            e.target.setSelectionRange(start, end);
+        });
+    }
+
+    // Add placeholder handler for Check Compliance button
+    if (checkBtn) {
+        checkBtn.addEventListener("click", () => {
+            const vin = vinInput.value.toUpperCase().trim();
+            if (validateVIN(vin)) {
+                // TODO: Integrate with existing CARB compliance check system
+                alert(`VIN ${vin} ready for compliance check.\n\nThis would connect to your existing CARB compliance API.`);
+            }
+        });
+    }
+
+    // Add placeholder handler for Scan VIN button
+    if (scanBtn) {
+        scanBtn.addEventListener("click", () => {
+            // TODO: Integrate with camera/barcode scanner
+            alert("Camera scanning would be integrated here.\n\nThis could use the device camera or a barcode scanning library.");
+        });
+    }
+
 });
