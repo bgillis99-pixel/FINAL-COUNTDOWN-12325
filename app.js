@@ -84,22 +84,43 @@ document.addEventListener('DOMContentLoaded', () => {
      * (local JSON map or API call).
      */
     async function lookupCountyByZip(zip) {
-        const cleanZip = (zip || "").trim();
-        if (!/^[0-9]{5}$/.test(cleanZip)) {
-            throw new Error("Invalid ZIP");
+        try {
+            const cleanZip = (zip || "").trim();
+            if (!/^[0-9]{5}$/.test(cleanZip)) {
+                throw new Error("Invalid ZIP format. Please enter a 5-digit ZIP code.");
+            }
+
+            // TODO: REPLACE with real data
+            // Example shape if using a local map:
+            // const county = ZIP_TO_COUNTY[cleanZip];
+            // if (!county) throw new Error("ZIP code not found in database");
+            // return { zip: cleanZip, county };
+
+            // Example if using an API:
+            // try {
+            //   const response = await fetch(`/api/zip-lookup?zip=${cleanZip}`);
+            //   if (!response.ok) {
+            //     throw new Error(`API returned ${response.status}: ${response.statusText}`);
+            //   }
+            //   const data = await response.json();
+            //   if (!data.county) {
+            //     throw new Error("ZIP code not found in database");
+            //   }
+            //   return { zip: cleanZip, county: data.county };
+            // } catch (fetchErr) {
+            //   console.error("ZIP lookup API error:", fetchErr);
+            //   throw new Error("Unable to connect to ZIP lookup service. Please try again.");
+            // }
+
+            // Temporary placeholder for testing:
+            return {
+                zip: cleanZip,
+                county: "Sacramento"
+            };
+        } catch (err) {
+            console.error("lookupCountyByZip error:", err.message);
+            throw err; // Re-throw to be handled by caller
         }
-
-        // TODO: REPLACE with real data
-        // Example shape if using a local map:
-        // const county = ZIP_TO_COUNTY[cleanZip];
-        // if (!county) throw new Error("ZIP not found");
-        // return { zip: cleanZip, county };
-
-        // Temporary placeholder for testing:
-        return {
-            zip: cleanZip,
-            county: "Sacramento"
-        };
     }
 
 
@@ -120,22 +141,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const testerCallLink = document.getElementById("tester-call-link");
 
     async function handleFindTesterZip() {
-      if (!zipInput) return;
+      if (!zipInput) {
+        console.error("ZIP input element not found");
+        return;
+      }
 
       const zip = zipInput.value.trim();
       if (!/^[0-9]{5}$/.test(zip)) {
+        zipError.textContent = "Please enter a valid 5-digit ZIP code.";
         zipError.hidden = false;
         testerResult.hidden = true;
         return;
       }
       zipError.hidden = true;
+      testerResult.hidden = true;
 
       try {
         // 1) Look up county
         const { county } = await lookupCountyByZip(zip);
 
+        if (!county) {
+          throw new Error("County data not available for this ZIP code.");
+        }
+
         // 2) Pick phone number
         const phone = getPhoneForCounty(county);
+
+        if (!phone) {
+          console.error("No phone number found for county:", county);
+          throw new Error("Contact information not available for this county.");
+        }
 
         // 3) Update UI
         testerCountyLine.textContent = `ZIP ${zip} is in ${county} County.`;
@@ -147,8 +182,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4) Optional: send event to your existing system
         // existingFindTesterFlow(zip, county, phone);
       } catch (err) {
-        console.error(err);
-        zipError.textContent = "We couldn't look up that ZIP. Please try again.";
+        console.error("handleFindTesterZip error:", err.message);
+
+        // Provide specific error messages based on error type
+        let errorMessage = "We couldn't look up that ZIP. Please try again.";
+
+        if (err.message.includes("Invalid ZIP")) {
+          errorMessage = "Please enter a valid 5-digit ZIP code.";
+        } else if (err.message.includes("not found")) {
+          errorMessage = "ZIP code not found. Please verify and try again.";
+        } else if (err.message.includes("connect") || err.message.includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else if (err.message.includes("County data") || err.message.includes("Contact information")) {
+          errorMessage = err.message; // Use the specific error message
+        }
+
+        zipError.textContent = errorMessage;
         zipError.hidden = false;
         testerResult.hidden = true;
       }
