@@ -163,17 +163,18 @@ document.addEventListener('DOMContentLoaded', () => {
      ******************************/
 
     /**
-     * Validates VIN format:
+     * Validates VIN format per ISO 3779 standard:
      * - Must be exactly 17 characters
-     * - Last 6 characters must be numeric
+     * - Can only contain A-Z (excluding I, O, Q) and 0-9
+     * - Letters I, O, Q are excluded to avoid confusion with 1, 0
      */
     function validateVIN(vin) {
         if (!vin || vin.length !== 17) {
             return false;
         }
-        // Last 6 characters must be numeric
-        const lastSix = vin.slice(-6);
-        return /^[0-9]{6}$/.test(lastSix);
+        // Valid VIN characters: A-Z (except I, O, Q) and 0-9
+        // I, O, Q are not used in VINs to avoid confusion with 1, 0
+        return /^[A-HJ-NPR-Z0-9]{17}$/.test(vin);
     }
 
     /**
