@@ -78,10 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // Load ZIP-to-county mapping
+    let zipCountyMap = {};
+
+    async function loadZipCountyMap() {
+        try {
+            const response = await fetch('/data/zip-county-map.json');
+            if (!response.ok) {
+                console.warn('Could not load ZIP mapping, using fallback');
+                return;
+            }
+            zipCountyMap = await response.json();
+        } catch (error) {
+            console.error('Error loading ZIP mapping:', error);
+        }
+    }
+
+    // Load the mapping when page loads
+    loadZipCountyMap();
+
     /**
-     * Look up county by ZIP.
-     * For now this is a stub – dev should replace with real implementation
-     * (local JSON map or API call).
+     * Look up county by ZIP using the loaded JSON map
      */
     async function lookupCountyByZip(zip) {
         const cleanZip = (zip || "").trim();
@@ -89,16 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error("Invalid ZIP");
         }
 
-        // TODO: REPLACE with real data
-        // Example shape if using a local map:
-        // const county = ZIP_TO_COUNTY[cleanZip];
-        // if (!county) throw new Error("ZIP not found");
-        // return { zip: cleanZip, county };
+        // Look up in our map
+        const county = zipCountyMap[cleanZip];
 
-        // Temporary placeholder for testing:
+        if (!county) {
+            throw new Error("ZIP code not found in our database");
+        }
+
         return {
             zip: cleanZip,
-            county: "Sacramento"
+            county: county
         };
     }
 
@@ -116,6 +133,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const testerCountyLine = document.getElementById("tester-county-line");
     const testerPhoneLine = document.getElementById("tester-phone-line");
     const testerCallLink = document.getElementById("tester-call-link");
+
+    /**
+     * Validate VIN format
+     * - Must be 17 characters
+     * - Last 6 must be numeric
+     */
+    function isValidVIN(vin) {
+        if (!vin || vin.length !== 17) return false;
+        const lastSix = vin.slice(-6);
+        return /^\d{6}$/.test(lastSix);
+    }
+
+    /**
+     * Handle VIN input changes
+     */
+    function handleVinInput() {
+        if (!vinInput) return;
+
+        // Auto-uppercase and remove spaces
+        let vin = vinInput.value.toUpperCase().replace(/\s/g, '');
+        vinInput.value = vin;
+
+        // Update character count
+        if (charCountEl) {
+            charCountEl.textContent = `${vin.length} / 17`;
+        }
+
+        // Validate and enable/disable button
+        const isValid = isValidVIN(vin);
+        if (checkBtn) {
+            checkBtn.disabled = !isValid;
+        }
+
+        // Show/hide error
+        if (errorEl) {
+            if (vin.length === 17 && !isValid) {
+                errorEl.hidden = false;
+            } else {
+                errorEl.hidden = true;
+            }
+        }
+    }
 
     async function handleFindTesterZip() {
       if (!zipInput) return;
@@ -150,6 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
         zipError.hidden = false;
         testerResult.hidden = true;
       }
+    }
+
+    // Attach event listeners
+    if (vinInput) {
+        vinInput.addEventListener('input', handleVinInput);
     }
 
     if (zipSubmitBtn) {
